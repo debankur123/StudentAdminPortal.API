@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StudentsAdminPortal.API.RepoImplementation;
 using StudentsAdminPortal.API.Repositories;
 
 namespace StudentsAdminPortal.API.Controllers
@@ -6,16 +7,16 @@ namespace StudentsAdminPortal.API.Controllers
     [ApiController]
     public class StudentController : Controller
     {
-        private readonly IStudentRepository _repo;
-        public StudentController(IStudentRepository _studentRepository)
+        private readonly IStudentRepository _studentRepository;
+        public StudentController(IStudentRepository studentRepository)
         {
-            this._repo = _studentRepository;
+            _studentRepository = studentRepository;
         }
         [HttpGet]
         [Route("students")]
         public async Task<IActionResult> getStudentsList()
         {
-            var students = await _repo.GetAllStudentsAsync();
+            var students = await _studentRepository.GetAllStudentsAsync();
             var domainModelsStudents = new List<Domain.Models.Student>();
             foreach (var studentModel in students)
             {
@@ -52,6 +53,18 @@ namespace StudentsAdminPortal.API.Controllers
             }
             return Ok(domainModelsStudents);
         }
+        [HttpGet]
+        [Route("students/{id:int}")]
+        public async Task<IActionResult> GetStudentAsync(int id)
+        {
+            var student = await _studentRepository.GetStudentAsync(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+            return new JsonResult(student);
+        }
+
 
     }
 }

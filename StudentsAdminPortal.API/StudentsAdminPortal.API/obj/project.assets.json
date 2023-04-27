@@ -10179,11 +10179,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API.csproj",
+      "projectUniqueName": "D:\\StudentAdminPortal\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API.csproj",
       "projectName": "StudentsAdminPortal.API",
-      "projectPath": "D:\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API.csproj",
+      "projectPath": "D:\\StudentAdminPortal\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API.csproj",
       "packagesPath": "C:\\Users\\012173\\.nuget\\packages\\",
-      "outputPath": "D:\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\obj\\",
+      "outputPath": "D:\\StudentAdminPortal\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\StudentsAdminPortal.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
