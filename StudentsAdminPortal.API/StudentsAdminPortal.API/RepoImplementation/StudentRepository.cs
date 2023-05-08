@@ -1,9 +1,10 @@
-﻿using Microsoft.CodeAnalysis.Elfie.Diagnostics;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using StudentsAdminPortal.API.Models;
+﻿using Microsoft.Data.SqlClient;
+using StudentsAdminPortal.API.Domain.Models;
+using StudentsAdminPortal.API.Domain.Models;
 using StudentsAdminPortal.API.Repositories;
-using System;
+using System.Data;
+using System.Data.SqlTypes;
+using System.Diagnostics;
 
 namespace StudentsAdminPortal.API.RepoImplementation
 {
@@ -16,9 +17,9 @@ namespace StudentsAdminPortal.API.RepoImplementation
             Configuration = _configuration;
             connectionString = Configuration.GetSection("ConnectionStrings").Get<ConnectionStrings>().StudentAdminPortal;
         }
-        public async Task<List<Student>> GetAllStudentsAsync()
+        public async Task<List<Domain.Models.Student>> GetAllStudentsAsync()
         {
-            List<Student> students = new List<Student>();
+            List<Domain.Models.Student> students = new List<Domain.Models.Student>();
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 try
@@ -29,7 +30,7 @@ namespace StudentsAdminPortal.API.RepoImplementation
                     SqlDataReader rda = await cmd.ExecuteReaderAsync();
                     while (await rda.ReadAsync())
                     {
-                        Student st = new Student();
+                        Domain.Models.Student st = new Domain.Models.Student();
                         st.Id = Convert.ToInt32(rda["Id"]);
                         st.firstName = rda["firstName"].ToString();
                         st.lastName = rda["lastName"].ToString();
@@ -39,15 +40,15 @@ namespace StudentsAdminPortal.API.RepoImplementation
                         st.profileImageURL = rda["profileImageURL"] == DBNull.Value ? null : rda["profileImageURL"].ToString();
                         st.genderID = Convert.ToInt32(rda["genderID"]);
 
-                        Gender gender = new Gender();
+                        Domain.Models.Gender gender = new Domain.Models.Gender();
                         gender.ID = Convert.ToInt32(rda["studentID"]);
                         gender.Description = rda["Description"].ToString();
                         st.gender = gender;
 
-                        Address address = new Address();
+                        Domain.Models.Address address = new Domain.Models.Address();
                         if (rda["address"] != DBNull.Value)
                         {
-                            address = new Address();
+                            address = new Domain.Models.Address();
                             address.ID = Convert.ToInt32(rda["studentID"]);
                             address.postalAddress = rda["postalAddress"] == DBNull.Value ? null : rda["postalAddress"].ToString();
                             address.physicalAddress = rda["physicalAddress"] == DBNull.Value ? null : rda["physicalAddress"].ToString();
@@ -65,9 +66,9 @@ namespace StudentsAdminPortal.API.RepoImplementation
             }
             return students;
         }
-        public async Task<Student> GetStudentAsync(int id)
+        public async Task<Domain.Models.Student> GetStudentAsync(int id)
         {
-            Student student = new Student();
+            Domain.Models.Student student = new Domain.Models.Student();
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 try
@@ -88,15 +89,15 @@ namespace StudentsAdminPortal.API.RepoImplementation
                         student.profileImageURL = reader["profileImageURL"] == DBNull.Value ? null : reader["profileImageURL"].ToString();
                         student.genderID = Convert.ToInt32(reader["genderID"]);
 
-                        Gender gender = new Gender();
+                        Domain.Models.Gender gender = new Domain.Models.Gender();
                         gender.ID = Convert.ToInt32(reader["StudentID"]);
                         gender.Description = reader["Description"].ToString();
                         student.gender = gender;
 
-                        Address address = new Address();
+                        Domain.Models.Address address = new Domain.Models.Address();
                         if (reader["address"] != DBNull.Value)
                         {
-                            address = new Address();
+                            address = new Domain.Models.Address();
                             address.ID = Convert.ToInt32(reader["StudentID"]);
                             address.postalAddress = reader["postalAddress"] == DBNull.Value ? null : reader["postalAddress"].ToString();
                             address.physicalAddress = reader["physicalAddress"] == DBNull.Value ? null : reader["physicalAddress"].ToString();
@@ -114,6 +115,68 @@ namespace StudentsAdminPortal.API.RepoImplementation
             }
         }
 
+        public async Task<List<Domain.Models.Gender>> GetGenderAsync()
+        {
+            List<Domain.Models.Gender> gender = new List<Domain.Models.Gender>();
+            string msg = "";
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    SqlCommand cmd = new SqlCommand("USP_GetAllGenders", con);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    await con.OpenAsync();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        Domain.Models.Gender gdn = new Domain.Models.Gender();
+                        gdn.ID = Convert.ToInt32(reader["ID"]);
+                        gdn.Description = reader["Description"].ToString();
+                        gender.Add(gdn);
+                    }
+                    await reader.CloseAsync();
+                }
+                catch(Exception ex)
+                {
+                    msg = ex.Message;
+                }
+                return gender;
+            }  
+        }
+
+        public async Task<UpdateStudentRecords> UpdateStudentDetails(int studentId, UpdateStudentRecords _records)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    SqlCommand command = new SqlCommand("USP_UpdateStudentAndAddressDetails", connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    await connection.OpenAsync();
+                    command.Parameters.AddWithValue("@ID", studentId);
+                    command.Parameters.AddWithValue("@firstName", _records.FirstName);
+                    command.Parameters.AddWithValue("@lastName", _records.LastName);
+                    command.Parameters.AddWithValue("@DOB", _records.DOB);
+                    command.Parameters.AddWithValue("@Email", _records.Email);
+                    command.Parameters.AddWithValue("@Mobile", _records.Mobile);
+                    command.Parameters.AddWithValue("@GenderID", _records.GenderID);
+                    command.Parameters.AddWithValue("@PostalAddress", _records.Address.physicalAddress ?? string.Empty);
+                    command.Parameters.AddWithValue("@PhysicalAddress", _records.Address.postalAddress ?? string.Empty);
+                    await command.ExecuteNonQueryAsync();
+                    return _records;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+
+
+
     }
 }
+
 

@@ -1,4 +1,4 @@
-﻿using StudentsAdminPortal.API.Models;
+﻿using StudentsAdminPortal.API.Domain.Models;
 
 namespace StudentsAdminPortal.API.Repositories
 {
@@ -6,5 +6,8 @@ namespace StudentsAdminPortal.API.Repositories
     {
         Task<List<Student>> GetAllStudentsAsync();
         Task<Student> GetStudentAsync(int id);
+        Task<List<Gender>> GetGenderAsync();
+        Task<UpdateStudentRecords> UpdateStudentDetails(int id, UpdateStudentRecords _records);
+        
     }
 }

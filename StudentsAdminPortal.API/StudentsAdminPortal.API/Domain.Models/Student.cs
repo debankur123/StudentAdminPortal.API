@@ -1,4 +1,4 @@
-﻿using StudentsAdminPortal.API.Models;
+﻿using StudentsAdminPortal.API.Domain.Models;
 
 namespace StudentsAdminPortal.API.Domain.Models
 {
@@ -14,5 +14,6 @@ namespace StudentsAdminPortal.API.Domain.Models
         public int genderID { get; set; }
         public Gender? gender { get; set; }
         public Address? address { get; set; }
+
     }
 }

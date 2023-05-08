@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StudentsAdminPortal.API.Domain.Models;
 using StudentsAdminPortal.API.RepoImplementation;
 using StudentsAdminPortal.API.Repositories;
 
@@ -64,7 +65,27 @@ namespace StudentsAdminPortal.API.Controllers
             }
             return new JsonResult(student);
         }
+        [HttpPut]
+        [Route("students/{id:int}")]
+        public async Task<IActionResult> UpdateStudentDetails(int id, [FromBody] UpdateStudentRecords records)
+        {
+            if (id != records.Id)
+            {
+                return BadRequest();
+            }
+            var updatedStudent = await _studentRepository.UpdateStudentDetails(id, records);
+
+            if (updatedStudent == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedStudent);
+        }
 
 
     }
 }
+
+        
+
