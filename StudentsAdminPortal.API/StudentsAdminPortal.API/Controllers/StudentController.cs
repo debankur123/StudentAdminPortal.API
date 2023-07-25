@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudentsAdminPortal.API.Domain.Models;
-using StudentsAdminPortal.API.RepoImplementation;
 using StudentsAdminPortal.API.Repositories;
 
 namespace StudentsAdminPortal.API.Controllers
@@ -9,9 +8,11 @@ namespace StudentsAdminPortal.API.Controllers
     public class StudentController : Controller
     {
         private readonly IStudentRepository _studentRepository;
-        public StudentController(IStudentRepository studentRepository)
+        private readonly IImageRepository _imageRepository;
+        public StudentController(IStudentRepository studentRepository, IImageRepository imageRepository)
         {
             _studentRepository = studentRepository;
+            _imageRepository = imageRepository;
         }
         [HttpGet]
         [Route("students")]
@@ -110,6 +111,27 @@ namespace StudentsAdminPortal.API.Controllers
             {
                 return BadRequest("Error occurred: " + ex.Message);
             }
+        }
+
+        [HttpPost]
+        [Route("students/{studentId:int}/upload-image")]
+        public async Task<IActionResult> UploadImage(int studentId,IFormFile profileImage)
+        {
+            // Check student exists or not?
+            var studentPresent = await _studentRepository.GetStudentAsync(studentId);
+            if(studentPresent == null)
+                return NotFound();
+
+            //store the image in local storage
+            var fileName = Guid.NewGuid() + Path.GetExtension(profileImage.FileName);
+            var fileImagePath = await _imageRepository.UploadImage(profileImage, fileName);
+
+            //update profile image path in database
+            if (await _studentRepository.UpdateProfileImage(studentId, fileImagePath))
+                return Ok(fileImagePath);
+            else
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error uploading Image");
+
         }
     }
 }

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.FileProviders;
 using StudentsAdminPortal.API.RepoImplementation;
 using StudentsAdminPortal.API.Repositories;
 
@@ -23,6 +24,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 
 builder.Services.AddSwaggerGen();
 
@@ -36,6 +38,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "Resources")),
+    RequestPath = "/Resources"
+}) ;
 
 app.UseCors("angularApplication");
 

@@ -214,6 +214,30 @@ namespace StudentsAdminPortal.API.RepoImplementation
             }
 
         }
+
+        public async Task<bool> UpdateProfileImage(int studentId,string ProfileImageURL)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    await connection.OpenAsync();
+                    using (SqlCommand command = new SqlCommand("USP_UpdateProfileImageURL", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@ProfileImageURL",ProfileImageURL);
+                        command.Parameters.AddWithValue("@studentId",studentId);
+                        int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                        return rowsAffected > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                   return false;
+                }
+            }
+        }
     }
 }
 

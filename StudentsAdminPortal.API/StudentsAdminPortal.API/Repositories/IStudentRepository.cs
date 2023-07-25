@@ -10,5 +10,6 @@ namespace StudentsAdminPortal.API.Repositories
         Task<UpdateStudentRecords> UpdateStudentDetails(int id, UpdateStudentRecords _records);
         void DeleteSingleStudent(int studentId);
         void AddStudentDetails(AddStudentRecords addRequest);
+        Task<bool> UpdateProfileImage(int studentId,string profileImageURL);
     }
 }
