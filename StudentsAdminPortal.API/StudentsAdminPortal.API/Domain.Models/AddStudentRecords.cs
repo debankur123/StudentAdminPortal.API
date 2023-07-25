@@ -1,14 +1,19 @@
 ﻿namespace StudentsAdminPortal.API.Domain.Models
 {
-    public class UpdateStudentRecords
+    public class AddStudentRecords
     {
-        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DOB { get; set; }
         public string Email { get; set; }
         public string Mobile { get; set; }
         public int GenderID { get; set; }
+        public string ProfileImageURL { get; set; }
         public Address Address { get; set; }
+        
+
+
+
+
     }
 }

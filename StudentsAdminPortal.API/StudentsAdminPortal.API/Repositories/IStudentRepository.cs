@@ -8,6 +8,7 @@ namespace StudentsAdminPortal.API.Repositories
         Task<Student> GetStudentAsync(int id);
         Task<List<Gender>> GetGenderAsync();
         Task<UpdateStudentRecords> UpdateStudentDetails(int id, UpdateStudentRecords _records);
-        
+        void DeleteSingleStudent(int studentId);
+        void AddStudentDetails(AddStudentRecords addRequest);
     }
 }

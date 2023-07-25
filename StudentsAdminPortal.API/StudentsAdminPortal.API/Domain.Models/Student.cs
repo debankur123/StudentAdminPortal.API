@@ -9,7 +9,7 @@ namespace StudentsAdminPortal.API.Domain.Models
         public string? lastName { get; set; }
         public DateTime? DOB { get; set; }
         public string? Email { get; set; }
-        public long Mobile { get; set; }
+        public string? Mobile { get; set; }
         public string? profileImageURL { get; set; }
         public int genderID { get; set; }
         public Gender? gender { get; set; }

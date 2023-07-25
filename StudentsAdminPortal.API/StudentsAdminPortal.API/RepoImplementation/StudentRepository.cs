@@ -1,10 +1,8 @@
 ﻿using Microsoft.Data.SqlClient;
 using StudentsAdminPortal.API.Domain.Models;
-using StudentsAdminPortal.API.Domain.Models;
 using StudentsAdminPortal.API.Repositories;
 using System.Data;
-using System.Data.SqlTypes;
-using System.Diagnostics;
+using System.Transactions;
 
 namespace StudentsAdminPortal.API.RepoImplementation
 {
@@ -34,9 +32,9 @@ namespace StudentsAdminPortal.API.RepoImplementation
                         st.Id = Convert.ToInt32(rda["Id"]);
                         st.firstName = rda["firstName"].ToString();
                         st.lastName = rda["lastName"].ToString();
-                        st.DOB = DateTime.Parse(rda["DOB"].ToString()).Date;
+                        st.DOB = DateTime.Parse(rda["DOB"].ToString());
                         st.Email = rda["Email"].ToString();
-                        st.Mobile = Convert.ToInt64(rda["Mobile"]);
+                        st.Mobile = rda["Mobile"].ToString();
                         st.profileImageURL = rda["profileImageURL"] == DBNull.Value ? null : rda["profileImageURL"].ToString();
                         st.genderID = Convert.ToInt32(rda["genderID"]);
 
@@ -83,8 +81,8 @@ namespace StudentsAdminPortal.API.RepoImplementation
                         student.Id = id;
                         student.firstName = reader["firstName"].ToString();
                         student.lastName = reader["lastName"].ToString();
-                        student.DOB = DateTime.Parse(reader["DOB"].ToString()).Date;
-                        student.Mobile = Convert.ToInt64(reader["Mobile"]);
+                        student.DOB = DateTime.Parse(reader["DOB"].ToString());
+                        student.Mobile = reader["Mobile"].ToString();
                         student.Email = reader["Email"].ToString();
                         student.profileImageURL = reader["profileImageURL"] == DBNull.Value ? null : reader["profileImageURL"].ToString();
                         student.genderID = Convert.ToInt32(reader["genderID"]);
@@ -136,12 +134,12 @@ namespace StudentsAdminPortal.API.RepoImplementation
                     }
                     await reader.CloseAsync();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     msg = ex.Message;
                 }
                 return gender;
-            }  
+            }
         }
 
         public async Task<UpdateStudentRecords> UpdateStudentDetails(int studentId, UpdateStudentRecords _records)
@@ -160,8 +158,8 @@ namespace StudentsAdminPortal.API.RepoImplementation
                     command.Parameters.AddWithValue("@Email", _records.Email);
                     command.Parameters.AddWithValue("@Mobile", _records.Mobile);
                     command.Parameters.AddWithValue("@GenderID", _records.GenderID);
-                    command.Parameters.AddWithValue("@PostalAddress", _records.Address.physicalAddress ?? string.Empty);
-                    command.Parameters.AddWithValue("@PhysicalAddress", _records.Address.postalAddress ?? string.Empty);
+                    command.Parameters.AddWithValue("@PostalAddress", _records.Address.postalAddress ?? string.Empty);
+                    command.Parameters.AddWithValue("@PhysicalAddress", _records.Address.physicalAddress ?? string.Empty);
                     await command.ExecuteNonQueryAsync();
                     return _records;
                 }
@@ -172,11 +170,52 @@ namespace StudentsAdminPortal.API.RepoImplementation
             }
         }
 
+        public void DeleteSingleStudent(int studentId)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand("USP_DELETE_SINGLE_STUDENT", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.Add("@Id", SqlDbType.Int).Value = studentId;
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
 
 
+        public void AddStudentDetails(AddStudentRecords student)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                try
+                {
+                    using (SqlCommand studentCommand = new SqlCommand("USP_InsertStudentRecord", connection))
+                    {
+                        studentCommand.CommandType = CommandType.StoredProcedure;
+                        studentCommand.Parameters.AddWithValue("@FirstName", student.FirstName);
+                        studentCommand.Parameters.AddWithValue("@LastName", student.LastName);
+                        studentCommand.Parameters.AddWithValue("@DOB", student.DOB);
+                        studentCommand.Parameters.AddWithValue("@Email", student.Email);
+                        studentCommand.Parameters.AddWithValue("@PhoneNo", student.Mobile);
+                        studentCommand.Parameters.AddWithValue("@GenderID", student.GenderID);
+                        studentCommand.Parameters.AddWithValue("@PhysicalAddress", student.Address.physicalAddress);
+                        studentCommand.Parameters.AddWithValue("@PostalAddress", student.Address.postalAddress);
+                        studentCommand.Parameters.AddWithValue("@ProfileImageURL", student.ProfileImageURL);
+                        studentCommand.ExecuteNonQuery();
+                    }
+                }
+                catch(Exception ex)
+                {
+                    throw ex;
+                }
+            }
 
-
+        }
     }
 }
+
 
 

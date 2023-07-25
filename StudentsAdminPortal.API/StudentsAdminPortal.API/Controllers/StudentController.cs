@@ -82,8 +82,35 @@ namespace StudentsAdminPortal.API.Controllers
 
             return Ok(updatedStudent);
         }
-
-
+        [HttpDelete]
+        [Route("students/{studentId:int}")]
+        public ActionResult DeleteSingleStudentRecord(int studentId)
+        {
+            var studentPresent =  _studentRepository.GetStudentAsync(studentId);
+            if (studentPresent == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                 _studentRepository.DeleteSingleStudent(studentId);
+                return Ok(studentId);
+            }
+        }
+        [HttpPost]
+        [Route("students/Add")]
+        public IActionResult InsertStudent([FromBody] AddStudentRecords details)
+        {
+            try
+            {
+                _studentRepository.AddStudentDetails(details);
+                return Ok(new { message = "Student record inserted successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error occurred: " + ex.Message);
+            }
+        }
     }
 }
 
